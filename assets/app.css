@@ -78,6 +78,10 @@ body.print .reveal.walk { background: none; margin: 2mm 0 0; padding: 2mm 0 0; }
 body.print .sec-label { margin-top: 3mm; }
 .c-red { color: #d62728; font-weight: 600; } .c-blue { color: #1f6fb4; font-weight: 600; } .c-green { color: #2a9d3a; font-weight: 600; }
 .c-orange { color: #ef6c00; font-weight: 600; } .c-gold { background: #ffd54f; padding: 0 3px; border-radius: 3px; }
+.runs { background: #f7f9fc; border: 1px solid var(--line); border-left: 4px solid #8fb0e0; border-radius: 8px; padding: 4px 14px 2px; margin: 2px 0 14px; font-size: 14.5px; }
+.runs-h { font-weight: 700; color: #2f4f86; margin: 6px 0 0; }
+.runs table { font-size: 13.5px; } .runs p { margin: 6px 0; }
+body.print .runs { background: none; }
 .lock { max-width: 420px; margin: 48px auto; text-align: center; }
 .lock form { display: flex; gap: 8px; margin-top: 16px; }
 .lock input { flex: 1; min-width: 0; font-size: 16px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; }
