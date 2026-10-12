@@ -107,6 +107,21 @@ body.print .q .qb { padding: 1mm 0; } body.print .space { border: 1px dashed #bb
 body.print .reveal.sol { background: none; margin: 2mm 0 0; padding: 2mm 0 0; }
 body.print h1 { font-size: 16pt; } body.print .papermeta { font-size: 10pt; color: #444; margin-bottom: 5mm; }
 @page { size: A4; margin: 14mm 15mm; }
+.qlang { margin: 6px 0 10px; } .qlang > p:first-of-type { display: inline; }
+.qlang .lang, .bi2 .lang { display: inline-block; font-size: 11.5px; font-weight: 700; color: #fff; background: #5c6f91; border-radius: 4px; padding: 0 6px; margin-right: 8px; vertical-align: 1px; }
+.qlang.zh { border-left: 3px solid #d7deea; padding-left: 10px; color: #2d3340; } .qlang.zh .lang { background: #8d9bb6; }
+.bi2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; } .bi2 .lang { margin: 4px 0 2px; }
+.meta { background: #fff7e0; border: 1px solid #f1dfab; border-radius: 6px; padding: 6px 12px; margin: 6px 0 12px; line-height: 1.75; }
+.meta > b { color: #9a6b00; margin-right: 8px; } .meta p { display: inline; margin: 0; }
+.en-block { color: #33415c; background: #f4f6fb; border-radius: 6px; padding: 4px 12px; margin: 8px 0; }
+.reveal.solzh { background: #fbfbfd; margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; }
+.reveal.pat { background: #f6fbf6; margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; }
+.pill.src-practice { background: #e8f1ff; color: #2f5fa8; } .pill.src-mock { background: #fff0e3; color: #a85a12; } .pill.src-past { background: #e9f6ea; color: #2e7a3a; }
+h2.grp { margin-top: 34px; border-bottom: 2px solid var(--line); padding-bottom: 4px; }
+details.tsum { border-color: #b9cbe6; } details.tsum > summary .t { color: #2f4f86; }
+body.print .acts { display: none !important; } body.print .reveal { border-top: 1px dashed #bbb; }
+body.print .reveal.solzh, body.print .reveal.pat { background: none; margin: 2mm 0 0; padding: 2mm 0 0; }
+body.print .meta { background: none; }
 @media (max-width: 600px) {
   .bar { flex-wrap: wrap; gap: 0 12px; padding: 8px 14px 2px; } .brand span { display: none; } .countdown { font-size: 12.5px; }
   main { padding: 14px 12px 60px; } details.box > summary { padding: 9px 12px; } details.box > .body { padding: 0 10px 10px; }
@@ -115,3 +130,4 @@ body.print h1 { font-size: 16pt; } body.print .papermeta { font-size: 10pt; colo
   .cs-wrap { height: 70vh; } iframe.cs { width: 794px; height: 2400px; }
   .tr-ctl { gap: 6px; } .tr-ctl .btn { padding: 5px 9px; } .tr-pos { min-width: 0; flex: 1; }
 }
+@media (max-width: 760px) { .bi2 { grid-template-columns: minmax(0, 1fr); gap: 4px; } }
