@@ -291,13 +291,35 @@
     if (!s.submitted) timerHandle = setInterval(tick, 1000);
   }
 
+  function csGuideHtml() {
+    var G = D.csg;
+    if (!G) return "";
+    var n = G.points.filter(function (p) { return p.id.charAt(0) !== "K"; }).length;
+    var h = '<h2>考点清单（' + n + ' 个考点 + K 组速查）</h2><p class="sub">编号和 cheat sheet 上一一对应。★ 表示往年常考或分值高。出处里 m11 Q4 (12) = 2011 期中第 4 题 12 分，Tut = tutorial，P2.2 = 本网站练习题。</p>';
+    G.sections.forEach(function (s) {
+      var pts = G.points.filter(function (p) { return p.id.charAt(0) === s.id; });
+      h += "<h3>" + s.id + " · " + s.en + '　<span class="en-t">' + esc(s.zh) + '</span>　<span class="muted">' + esc(s.lec) + "</span></h3>";
+      h += '<table class="csg"><tr><th>编号</th><th>English（cheat sheet 上的标题）</th><th>中文</th><th>出处</th></tr>' + pts.map(function (p) {
+        return "<tr><td><b>" + p.id + "</b>" + (p.star ? " ★" : "") + "</td><td>" + p.en + "</td><td>" + esc(p.zh) + '</td><td class="muted">' + esc(p.src) + "</td></tr>";
+      }).join("") + "</table>";
+    });
+    h += '<h2>速查索引：看到题目里的说法 → 去哪个考点</h2><table class="csg"><tr><th>题目里的说法</th><th>考点</th></tr>' + G.index.map(function (x) {
+      return "<tr><td>" + x.k + "</td><td><b>" + esc(x.ids) + "</b></td></tr>";
+    }).join("") + "</table>";
+    h += '<h2>术语中英对照</h2><table class="csg"><tr><th>English</th><th>中文</th><th>白话</th></tr>' + G.terms.map(function (t) {
+      return "<tr><td>" + t.en + "</td><td>" + t.zh + "</td><td>" + t.note + "</td></tr>";
+    }).join("") + "</table>";
+    return h;
+  }
+
   function viewCheatsheet() {
-    var h = '<h1>Cheat sheet（两张单面 A4）</h1><p class="sub">按今年期中范围 L01–L13 重写，英文为主，模板句子可以直接抄进答卷。第 1 张是定义与构造，第 2 张是证明模板、闭包表和常见反例。里面的正则表达式和恒等式都做过程序验证。</p>';
-    h += ONLINE ? '<p><button class="btn primary" data-act="csopen">全屏打开</button></p>'
-      : '<p><a class="btn primary" href="print/cheatsheet.pdf" target="_blank">打开 PDF（打印用）</a> <a class="btn" href="cheatsheet.html" target="_blank">打开网页版</a></p>';
-    h += '<div class="warn">公告只说可以带 "two one-sided A4 cheat sheets"，没说必须手写。如果 10/12 课上老师要求手写，就照着这份抄；抄的过程本身也是很好的复习。和同学那份相比，这份补上了子集构造、$R(i,j,k)$、两个泵引理的模板和选 $w$ 的表、CFG→PDA、闭包反例，去掉了图灵机和复杂度。</div>';
+    var h = '<h1>Cheat sheet（两张单面 A4）</h1><p class="sub">根据 L00–L13 slides、HW1–HW2 及官方答案、Quiz 2–4、Tutorial 1–5、2011–2013 期中卷和 10/12 复习课整理成 40 个考点。每个考点：英文题目（Q）、英文标准答案（A）、中文变体（变）、英文答题模板（T）。第 1 张是正则语言（A–F），第 2 张是上下文无关语言（G–J）和判断题速查、英文句型、丢分点（K）。答案里的构造都做过程序验证；字号由程序自动取到刚好装满两页。</p>';
+    h += ONLINE ? '<p><button class="btn primary" data-act="csopen">全屏打开</button> <a class="btn" href="?print=csg" target="_blank">打印考点清单与中英对照</a></p>'
+      : '<p><a class="btn primary" href="print/cheatsheet.pdf" target="_blank">打开 PDF（打印用）</a> <a class="btn" href="cheatsheet.html" target="_blank">打开网页版</a> <a class="btn" href="print/cheatsheet_guide.pdf" target="_blank">考点清单与中英对照 PDF</a></p>';
+    h += '<div class="warn">9/30 课程公告原文："closed-book with two one-sided A4 cheat sheets"，即两张 A4，每张只用一面，没说必须手写。打印时选 A4、<b>实际大小（100%）</b>，不要选"适合页面"，单面打印两张。内容离纸边约 4 mm。</div>';
     h += '<div class="cs-wrap">' + (ONLINE ? '<iframe class="cs" srcdoc="' + esc(D.cheatsheetHtml) + '" title="cheat sheet"></iframe>'
       : '<iframe class="cs" src="cheatsheet.html" title="cheat sheet"></iframe>') + "</div>";
+    h += csGuideHtml();
     return h;
   }
 
@@ -342,6 +364,8 @@
         h += '<h2 class="' + (i ? "pb" : "") + '">' + t.id + " " + esc(t.name) + '　<span class="en-t">' + esc(t.en) + '</span>　<span class="muted">' + t.lectures.join(" ") + "</span></h2>" + t.explain +
           "<h3>中英套路模板</h3>" + typeBiHtml(t) + "<h3>模板与评分（速查）</h3>" + typeTemplateHtml(t);
       });
+    } else if (mode === "csg") {
+      h += '<h1>COMP3721 Cheat sheet — 考点清单与中英对照</h1><div class="papermeta">配合两张单面 A4 cheat sheet 使用 · 生成于 ' + esc(D.generated) + "</div>" + csGuideHtml();
     } else if (mode === "past") {
       var P = D.past;
       h += '<h1>COMP3721 往年期中卷详细讲解（2011–2013）</h1><div class="papermeta">生成于 ' + esc(D.generated) + "</div>" + P.insights;
