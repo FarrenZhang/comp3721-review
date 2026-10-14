@@ -293,14 +293,14 @@
 
   function csGuideHtml() {
     var G = D.csg;
-    if (!G) return "";
-    var n = G.points.filter(function (p) { return p.id.charAt(0) !== "K"; }).length;
-    var h = '<h2>考点清单（' + n + ' 个考点 + K 组速查）</h2><p class="sub">编号和 cheat sheet 上一一对应。★ 表示往年常考或分值高。出处里 m11 Q4 (12) = 2011 期中第 4 题 12 分，Tut = tutorial，P2.2 = 本网站练习题。</p>';
-    G.sections.forEach(function (s) {
-      var pts = G.points.filter(function (p) { return p.id.charAt(0) === s.id; });
-      h += "<h3>" + s.id + " · " + s.en + '　<span class="en-t">' + esc(s.zh) + '</span>　<span class="muted">' + esc(s.lec) + "</span></h3>";
-      h += '<table class="csg"><tr><th>编号</th><th>English（cheat sheet 上的标题）</th><th>中文</th><th>出处</th></tr>' + pts.map(function (p) {
-        return "<tr><td><b>" + p.id + "</b>" + (p.star ? " ★" : "") + "</td><td>" + p.en + "</td><td>" + esc(p.zh) + '</td><td class="muted">' + esc(p.src) + "</td></tr>";
+    if (!G || !G.tiers) return "";
+    var n = 0;
+    G.tiers.forEach(function (t) { if (t.id !== "K") n += t.points.length; });
+    var h = '<h2>考点清单（' + n + ' 个考点，按考频从高到低）</h2><p class="sub">编号和 cheat sheet 上一一对应。第 1 档 ★★★ 是 2011–2013 每份期中卷都考的题型，约占往年分数的 80%；第 2 档 ★★ 在作业、tutorial 或某一年的期中出现过；第 3 档 ★ 是答题时要用到的定义和基础。出处里 m11 Q4 (12) = 2011 期中第 4 题 12 分，Tut = tutorial，P2.2 = 本网站练习题；“图×2” 表示 cheat sheet 上配了 2 张状态图或语法树。</p>';
+    G.tiers.forEach(function (t) {
+      h += "<h3>" + (t.id === "K" ? "K · 速查" : "第 " + t.id + " 档 " + t.stars) + '　<span class="en-t">' + esc(t.en) + '</span></h3><p class="muted">' + esc(t.zh) + "</p>";
+      h += '<table class="csg"><tr><th>编号</th><th>English（cheat sheet 上的标题）</th><th>中文</th><th>出处</th></tr>' + t.points.map(function (p) {
+        return "<tr><td><b>" + p.num + "</b>" + (p.figs ? ' <span class="pill">图×' + p.figs + "</span>" : "") + "</td><td>" + p.en + "</td><td>" + esc(p.zh) + '</td><td class="muted">' + esc(p.src) + "</td></tr>";
       }).join("") + "</table>";
     });
     h += '<h2>速查索引：看到题目里的说法 → 去哪个考点</h2><table class="csg"><tr><th>题目里的说法</th><th>考点</th></tr>' + G.index.map(function (x) {
@@ -313,7 +313,7 @@
   }
 
   function viewCheatsheet() {
-    var h = '<h1>Cheat sheet（两张单面 A4）</h1><p class="sub">根据 L00–L13 slides、HW1–HW2 及官方答案、Quiz 2–4、Tutorial 1–5、2011–2013 期中卷和 10/12 复习课整理成 40 个考点。每个考点：英文题目（Q）、英文标准答案（A）、中文变体（变）、英文答题模板（T）。第 1 张是正则语言（A–F），第 2 张是上下文无关语言（G–J）和判断题速查、英文句型、丢分点（K）。答案里的构造都做过程序验证；字号由程序自动取到刚好装满两页。</p>';
+    var h = '<h1>Cheat sheet（两张单面 A4）</h1><p class="sub">根据 L00–L13 slides、HW1–HW2 及官方答案、Quiz 2–4、Tutorial 1–5、2011–2013 期中卷和 10/12 复习课整理成 40 个考点，按考频从高到低排：第 1 档 ★★★（每份往年期中都考，约占往年分数的 80%）在最前面，然后是第 2 档 ★★、第 3 档 ★，最后是判断题速查、英文句型和丢分点。每个考点：英文题目（Q）、英文标准答案（A）、中文变体（变）、英文答题模板（T）；DFA、NFA、PDA 的状态图和语法树一共 11 张图。答案里的构造和图都做过程序验证；字号由程序自动取到刚好装满两页。</p>';
     h += ONLINE ? '<p><button class="btn primary" data-act="csopen">全屏打开</button> <a class="btn" href="?print=csg" target="_blank">打印考点清单与中英对照</a></p>'
       : '<p><a class="btn primary" href="print/cheatsheet.pdf" target="_blank">打开 PDF（打印用）</a> <a class="btn" href="cheatsheet.html" target="_blank">打开网页版</a> <a class="btn" href="print/cheatsheet_guide.pdf" target="_blank">考点清单与中英对照 PDF</a></p>';
     h += '<div class="warn">9/30 课程公告原文："closed-book with two one-sided A4 cheat sheets"，即两张 A4，每张只用一面，没说必须手写。打印时选 A4、<b>实际大小（100%）</b>，不要选"适合页面"，单面打印两张。内容离纸边约 4 mm。</div>';
