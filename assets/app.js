@@ -296,7 +296,7 @@
     if (!G || !G.tiers) return "";
     var n = 0;
     G.tiers.forEach(function (t) { if (t.id !== "K") n += t.points.length; });
-    var h = '<h2>考点清单（' + n + ' 个考点，按考频从高到低）</h2><p class="sub">编号和 cheat sheet 上一一对应。第 1 档 ★★★ 是 2011–2013 每份期中卷都考的题型，约占往年分数的 80%；第 2 档 ★★ 在作业、tutorial 或某一年的期中出现过；第 3 档 ★ 是答题时要用到的定义和基础。出处里 m11 Q4 (12) = 2011 期中第 4 题 12 分，Tut = tutorial，P2.2 = 本网站练习题；“图×2” 表示 cheat sheet 上配了 2 张状态图或语法树。</p>';
+    var h = '<h2>考点清单（' + n + ' 个考点，按考频从高到低）</h2><p class="sub">编号和 cheat sheet 上一一对应。第 1 档 ★★★ 是往年期中每份都考、作业考过或 10/12 复习课讲过的题型；第 2 档 ★★ 在作业、tutorial、quiz 或某一年的期中出现过；第 3 档 ★ 是答题时要用到的定义和基础。逐条的中文解释见“CS 详解”页。出处里 m11 Q4 (12) = 2011 期中第 4 题 12 分，Tut = tutorial，P2.2 = 本网站练习题；“图×2” 表示 cheat sheet 上配了 2 张状态图或语法树。</p>';
     G.tiers.forEach(function (t) {
       h += "<h3>" + (t.id === "K" ? "K · 速查" : "第 " + t.id + " 档 " + t.stars) + '　<span class="en-t">' + esc(t.en) + '</span></h3><p class="muted">' + esc(t.zh) + "</p>";
       h += '<table class="csg"><tr><th>编号</th><th>English（cheat sheet 上的标题）</th><th>中文</th><th>出处</th></tr>' + t.points.map(function (p) {
@@ -313,7 +313,7 @@
   }
 
   function viewCheatsheet() {
-    var h = '<h1>Cheat sheet（两张单面 A4）</h1><p class="sub">根据 L00–L13 slides、HW1–HW2 及官方答案、Quiz 2–4、Tutorial 1–5、2011–2013 期中卷和 10/12 复习课整理成 40 个考点，按考频从高到低排：第 1 档 ★★★（每份往年期中都考，约占往年分数的 80%）在最前面，然后是第 2 档 ★★、第 3 档 ★，最后是判断题速查、英文句型和丢分点。每个考点：英文题目（Q）、英文标准答案（A）、中文变体（变）、英文答题模板（T）；DFA、NFA、PDA 的状态图和语法树一共 11 张图。答案里的构造和图都做过程序验证；字号由程序自动取到刚好装满两页。</p>';
+    var h = '<h1>Cheat sheet（两张单面 A4）</h1><p class="sub">根据 L00–L13 slides、HW1–HW2 及官方答案、Quiz 2–4、Tutorial 1–5、2011–2013 期中卷和 10/12 复习课整理成 40 个考点，按考频从高到低排：第 1 档 ★★★（16 条：往年期中每份都考、作业考过或复习课讲过）在最前面，然后是第 2 档 ★★、第 3 档 ★，最后是判断题速查、英文句型和丢分点。每个考点：英文题目（Q）、英文标准答案（A）、中文变体（变）、英文答题模板（T）；DFA、NFA、子集构造、PDA 的状态图和语法树一共 14 张，除语法树外都在第 1 页。答案里的构造和图都做过程序验证；字号由程序自动取到刚好装满两页，并自动检查没有任何内容压到相邻栏。<b>看不懂某一条，去顶部的“CS 详解”页，那里逐条有中文解释。</b></p>';
     h += ONLINE ? '<p><button class="btn primary" data-act="csopen">全屏打开</button> <a class="btn" href="?print=csg" target="_blank">打印考点清单与中英对照</a></p>'
       : '<p><a class="btn primary" href="print/cheatsheet.pdf" target="_blank">打开 PDF（打印用）</a> <a class="btn" href="cheatsheet.html" target="_blank">打开网页版</a> <a class="btn" href="print/cheatsheet_guide.pdf" target="_blank">考点清单与中英对照 PDF</a></p>';
     h += '<div class="warn">9/30 课程公告原文："closed-book with two one-sided A4 cheat sheets"，即两张 A4，每张只用一面，没说必须手写。打印时选 A4、<b>实际大小（100%）</b>，不要选"适合页面"，单面打印两张。内容离纸边约 4 mm。</div>';
@@ -321,6 +321,72 @@
       : '<iframe class="cs" src="cheatsheet.html" title="cheat sheet"></iframe>') + "</div>";
     h += csGuideHtml();
     return h;
+  }
+
+  // ------------------------------------------------------------------ cheat sheet explained
+  function csxPointHtml(p, lazy) {
+    var o = p.orig, x = p.x;
+    function row(label, en, zh) {
+      return '<div class="csx-row"><div class="csx-en"><span class="csx-lab">' + label + "</span>" + (en || "") + '</div><div class="csx-zh">' + (zh || "") + "</div></div>";
+    }
+    var b = "";
+    if (!x) b += '<p class="muted">（这一条的中文详解还没写好）</p>';
+    if (x && x.kind) b += '<div class="csx-kind"><div class="sec-label">这是哪类题</div>' + x.kind + "</div>";
+    b += '<div class="csx-head"><div>cheat sheet 原文</div><div>中文详解</div></div>';
+    if (o.q) b += row("Q", o.q, x && x.q);
+    if (o.a) b += row("A", o.a, x && x.a);
+    o.figs.forEach(function (f, i) { b += row("图", '<div class="fig">' + f.svg + '</div><div class="cap">' + f.cap + "</div>", x && x.figs[i]); });
+    if (o.extra) b += row("表", '<div class="tbl csx-tbl">' + o.extra + "</div>", x && x.extra);
+    if (o.v.length) b += row("变", o.v.map(function (v, i) { return '<div class="vi">' + "①②③④".charAt(i) + " " + v + "</div>"; }).join(""),
+      x && x.v ? x.v : '<p class="muted">变体本身就是中文，直接看左边。</p>');
+    if (o.t) b += row("T", o.t, x && x.t);
+    if (x && x.terms.length) {
+      b += '<div class="sec-label">本条英文术语</div><div class="tbl"><table class="csg"><tr><th>English</th><th>中文</th><th>白话</th></tr>' +
+        x.terms.map(function (t) { return "<tr><td>" + t[0] + "</td><td>" + t[1] + "</td><td>" + t[2] + "</td></tr>"; }).join("") + "</table></div>";
+    }
+    if (x && x.exam) b += '<div class="csx-exam"><div class="sec-label">考场怎么用</div>' + x.exam + "</div>";
+    return '<details class="box csx" id="csx-' + p.num + '"><summary><span class="csx-num">' + p.num + '</span><span class="t">' + p.en + "</span><span>" + esc(p.zh) +
+      '</span><span class="muted">' + esc(p.srcZh) + '</span></summary><div class="body' + (lazy ? " lazy" : "") + '">' + b + "</div></details>";
+  }
+
+  function csxTopHtml() {
+    var X = D.csx;
+    return '<details class="box intro" open><summary><span class="t">先看这里：这张 cheat sheet 怎么读</span></summary><div class="body">' + X.intro + X.legend + "</div></details>" +
+      '<details class="box intro"><summary><span class="t">第 1 页顶部两个框：FIND THE POINT 索引 · ALWAYS 通用句式</span></summary><div class="body">' +
+      '<p><b>FIND THE POINT</b>：题目里出现左边的英文说法，就去右边那几条找。</p><div class="tbl"><table class="csg"><tr><th>题目里的英文说法</th><th>中文意思</th><th>去第几条</th></tr>' +
+      X.index.map(function (r) { return "<tr><td>" + r.k + "</td><td>" + r.zh + "</td><td><b>" + esc(r.ids) + "</b></td></tr>"; }).join("") + "</table></div>" +
+      '<p><b>ALWAYS</b>：四种通用证明句式。左边是 cheat sheet 原文，右边是中文。</p><div class="tbl"><table class="csg"><tr><th>原文</th><th>中文</th></tr>' +
+      X.general.map(function (g) { return "<tr><td>" + g.en + "</td><td>" + g.zh + "</td></tr>"; }).join("") + "</table></div></div></details>";
+  }
+
+  function tierTitle(t) { return t.id === "K" ? "K 组 · 速查" : "第 " + t.id + " 档 " + t.stars; }
+
+  function viewCsx() {
+    var X = D.csx;
+    var h = '<h1>Cheat sheet 逐条详解</h1><p class="sub">两页 cheat sheet 上的每一条都在这里讲清楚。每条开头先说<b>它对应哪类考题</b>；中间左边是 cheat sheet 原文（英文，字放大了），右边是<b>逐句中文解释</b>；最后是本条的英文术语和<b>考场怎么用</b>。编号和顺序与打印版完全一致，点标题展开。</p>';
+    h += '<p><button class="btn" data-act="openall">全部展开</button> <button class="btn" data-act="closeall">全部收起</button> ' +
+      pdfBtn("print/cheatsheet_explained.pdf", "打印版 PDF（全部展开）") + " " + pdfBtn("print/cheatsheet.pdf", "cheat sheet PDF") + "</p>";
+    if (X.missing.length) h += '<div class="warn">还有 ' + X.missing.length + " 条的详解没写好：" + esc(X.missing.join(" ")) + "</div>";
+    h += csxTopHtml();
+    h += '<div class="card csx-toc"><b>目录</b>（点编号直接跳到那一条）' + X.tiers.map(function (t) {
+      return '<div><span class="muted">' + tierTitle(t) + "</span>　" + t.points.map(function (p) {
+        return '<a href="#csx/' + p.num + '" data-act="csxgo" data-n="' + p.num + '"><b>' + p.num + "</b> " + esc(p.zh) + "</a>";
+      }).join("") + "</div>";
+    }).join("") + "</div>";
+    X.tiers.forEach(function (t) {
+      h += "<h2>" + tierTitle(t) + '　<span class="en-t">' + esc(t.en) + '</span></h2><p class="muted">' + esc(t.zh) + "</p>" +
+        t.points.map(function (p) { return csxPointHtml(p, true); }).join("");
+    });
+    return h;
+  }
+
+  function openCsx(n) {
+    var el = document.getElementById("csx-" + n);
+    if (!el) return;
+    el.open = true;
+    var body = el.querySelector(".body.lazy");
+    if (body) unlazy(body);
+    el.scrollIntoView({ block: "start" });
   }
 
   // ------------------------------------------------------------------ print mode
@@ -366,6 +432,11 @@
       });
     } else if (mode === "csg") {
       h += '<h1>COMP3721 Cheat sheet — 考点清单与中英对照</h1><div class="papermeta">配合两张单面 A4 cheat sheet 使用 · 生成于 ' + esc(D.generated) + "</div>" + csGuideHtml();
+    } else if (mode === "csx") {
+      h += '<h1>COMP3721 Cheat sheet 逐条详解（中英对照）</h1><div class="papermeta">编号与两页 cheat sheet 一致 · 左：原文　右：中文解释 · 生成于 ' + esc(D.generated) + "</div>" + csxTopHtml();
+      D.csx.tiers.forEach(function (t) {
+        h += '<h2 class="pb">' + tierTitle(t) + '　<span class="en-t">' + esc(t.en) + "</span></h2>" + t.points.map(function (p) { return csxPointHtml(p, false); }).join("");
+      });
     } else if (mode === "past") {
       var P = D.past;
       h += '<h1>COMP3721 往年期中卷详细讲解（2011–2013）</h1><div class="papermeta">生成于 ' + esc(D.generated) + "</div>" + P.insights;
@@ -392,7 +463,7 @@
     var r = route();
     if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
     if (r.view === "practice") r.view = "drill";
-    var views = { overview: viewOverview, knowledge: viewKnowledge, types: viewTypes, past: viewPast, drill: viewDrill, mock: viewMock, cheatsheet: viewCheatsheet };
+    var views = { overview: viewOverview, knowledge: viewKnowledge, types: viewTypes, past: viewPast, drill: viewDrill, mock: viewMock, cheatsheet: viewCheatsheet, csx: viewCsx };
     var fn = views[r.view] || viewOverview;
     app.innerHTML = r.view === "drill" ? viewDrill(r.arg || "all") : fn(r.arg);
     typeset(app);
@@ -401,7 +472,9 @@
       var m = D.mocks.filter(function (x) { return x.id === r.arg; })[0];
       if (m) startTimer(m);
     }
-    if (r.arg && (r.view === "types" || r.view === "knowledge")) {
+    if (r.arg && r.view === "csx") {
+      openCsx(r.arg);
+    } else if (r.arg && (r.view === "types" || r.view === "knowledge")) {
       var el = document.getElementById((r.view === "types" ? "t-" : "k-") + r.arg);
       if (el) { el.open = true; el.scrollIntoView({ block: "start" }); }
     } else {
@@ -464,6 +537,10 @@
       });
     } else if (act === "openall" || act === "closeall") {
       Array.prototype.forEach.call(app.querySelectorAll("details.box"), function (d) { d.open = act === "openall"; });
+    } else if (act === "csxgo") {
+      ev.preventDefault();
+      history.replaceState(null, "", "#csx/" + b.getAttribute("data-n"));
+      openCsx(b.getAttribute("data-n"));
     } else if (act === "csopen") {
       var base = location.href.replace(/[#?].*$/, "").replace(/[^/]*$/, "");
       var page = D.cheatsheetHtml.replace("<head>", '<head><base href="' + base + '">');
@@ -480,6 +557,14 @@
       save("mock." + b.getAttribute("data-id"), { start: null, submitted: false, scores: {} }); render();
     }
   });
+
+  app.addEventListener("toggle", function (ev) {
+    var d = ev.target;
+    if (d.open && d.classList && d.classList.contains("csx")) {
+      var body = d.querySelector(".body.lazy");
+      if (body) unlazy(body);
+    }
+  }, true);
 
   app.addEventListener("input", function (ev) {
     var b = ev.target;
