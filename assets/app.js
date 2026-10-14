@@ -296,7 +296,7 @@
     if (!G || !G.tiers) return "";
     var n = 0;
     G.tiers.forEach(function (t) { if (t.id !== "K") n += t.points.length; });
-    var h = '<h2>考点清单（' + n + ' 个考点，按考频从高到低）</h2><p class="sub">编号和 cheat sheet 上一一对应。第 1 档 ★★★ 是往年期中每份都考、作业考过或 10/12 复习课讲过的题型；第 2 档 ★★ 在作业、tutorial、quiz 或某一年的期中出现过；第 3 档 ★ 是答题时要用到的定义和基础。逐条的中文解释见“CS 详解”页。出处里 m11 Q4 (12) = 2011 期中第 4 题 12 分，Tut = tutorial，P2.2 = 本网站练习题；“图×2” 表示 cheat sheet 上配了 2 张状态图或语法树。</p>';
+    var h = '<h2>考点清单（' + n + ' 个考点，按考频从高到低）</h2><p class="sub">编号和 cheat sheet 上一一对应。第 1 档 ★★★ 是往年期中每份都考、作业考过或 10/12 复习课讲过的题型；第 2 档 ★★ 在作业、tutorial、quiz 或某一年的期中出现过；第 3 档 ★ 是答题时要用到的定义和基础。逐条的中文解释见“Cheat sheet 详解”页。出处里 m11 Q4 (12) = 2011 期中第 4 题 12 分，Tut = tutorial，P2.2 = 本网站练习题；“图×2” 表示 cheat sheet 上配了 2 张状态图或语法树。</p>';
     G.tiers.forEach(function (t) {
       h += "<h3>" + (t.id === "K" ? "K · 速查" : "第 " + t.id + " 档 " + t.stars) + '　<span class="en-t">' + esc(t.en) + '</span></h3><p class="muted">' + esc(t.zh) + "</p>";
       h += '<table class="csg"><tr><th>编号</th><th>English（cheat sheet 上的标题）</th><th>中文</th><th>出处</th></tr>' + t.points.map(function (p) {
@@ -313,7 +313,7 @@
   }
 
   function viewCheatsheet() {
-    var h = '<h1>Cheat sheet（两张单面 A4）</h1><p class="sub">根据 L00–L13 slides、HW1–HW2 及官方答案、Quiz 2–4、Tutorial 1–5、2011–2013 期中卷和 10/12 复习课整理成 40 个考点，按考频从高到低排：第 1 档 ★★★（16 条：往年期中每份都考、作业考过或复习课讲过）在最前面，然后是第 2 档 ★★、第 3 档 ★，最后是判断题速查、英文句型和丢分点。每个考点：英文题目（Q）、英文标准答案（A）、中文变体（变）、英文答题模板（T）；DFA、NFA、子集构造、PDA 的状态图和语法树一共 14 张，除语法树外都在第 1 页。答案里的构造和图都做过程序验证；字号由程序自动取到刚好装满两页，并自动检查没有任何内容压到相邻栏。<b>看不懂某一条，去顶部的“CS 详解”页，那里逐条有中文解释。</b></p>';
+    var h = '<h1>Cheat sheet（两张单面 A4）</h1><p class="sub">根据 L00–L13 slides、HW1–HW2 及官方答案、Quiz 2–4、Tutorial 1–5、2011–2013 期中卷和 10/12 复习课整理成 40 个考点，按考频从高到低排：第 1 档 ★★★（16 条：往年期中每份都考、作业考过或复习课讲过）在最前面，然后是第 2 档 ★★、第 3 档 ★，最后是判断题速查、英文句型和丢分点。每个考点：英文题目（Q）、英文标准答案（A）、中文变体（变）、英文答题模板（T）；DFA、NFA、子集构造、PDA 的状态图和语法树一共 14 张，除语法树外都在第 1 页。答案里的构造和图都做过程序验证；字号由程序自动取到刚好装满两页，并自动检查没有任何内容压到相邻栏。<b>看不懂某一条，去顶部的“Cheat sheet 详解”页，那里逐条有中文解释。</b></p>';
     h += ONLINE ? '<p><button class="btn primary" data-act="csopen">全屏打开</button> <a class="btn" href="?print=csg" target="_blank">打印考点清单与中英对照</a></p>'
       : '<p><a class="btn primary" href="print/cheatsheet.pdf" target="_blank">打开 PDF（打印用）</a> <a class="btn" href="cheatsheet.html" target="_blank">打开网页版</a> <a class="btn" href="print/cheatsheet_guide.pdf" target="_blank">考点清单与中英对照 PDF</a></p>';
     h += '<div class="warn">9/30 课程公告原文："closed-book with two one-sided A4 cheat sheets"，即两张 A4，每张只用一面，没说必须手写。打印时选 A4、<b>实际大小（100%）</b>，不要选"适合页面"，单面打印两张。内容离纸边约 4 mm。</div>';
@@ -584,6 +584,11 @@
     renderPrint(pr);
   } else {
     window.addEventListener("hashchange", render);
+    // clicking the tab of the page already shown fires no hashchange, so redraw it from the top
+    document.getElementById("nav").addEventListener("click", function (ev) {
+      var a = ev.target.closest("a[href^='#']");
+      if (a && a.getAttribute("href") === (location.hash || "#overview")) { ev.preventDefault(); render(); }
+    });
     countdown();
     setInterval(countdown, 60000);
     render();
